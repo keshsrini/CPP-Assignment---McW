@@ -58,7 +58,7 @@ The logic in `src/` is built as a library, so both the app and the tests can use
 
 ## 3. OS / Tools / Versions Used
 
-####1.OS - Win 11
+- 1.OS - Win 11
 ####2.Compiler - g++ 15.2.0
 ####3.Build System - CMake 3.20
 ####4.Test Framework - Google Test v1.15.2
