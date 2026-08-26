@@ -5,21 +5,19 @@
 A menu-driven hotel reservation system written in C++20, running in the terminal.
 
 The hotel starts with 10 rooms:
+101 - 105    Standard    2 guests    2000/night
+201 - 205    Deluxe      3 guests    3500/night
 
-| Rooms | Category | Capacity | Rate |
-|---|---|---|---|
-| 101-105 | Standard | 2 guests | 2000 per night |
-| 201-205 | Deluxe | 3 guests | 3500 per night |
 
 You can book a room for a date range, check a guest in, check them out (which generates the bill), cancel a booking, move a booking to different dates, search for free rooms, and view occupancy and revenue reports.
 
 A booking moves through these states, and anything else is rejected with an error:
 
-```
-Booked  ->  CheckedIn  ->  CheckedOut
-   |
-   +------->  Cancelled
-```
+Booked->Checked In->Checked Out
+Booked->Cancelled
+Booked->Modified->Checked In->CheckedOut
+
+
 
 Booking is thread-safe - if two threads book the same room for the same dates, only one succeeds.
 
@@ -56,21 +54,19 @@ The logic in `src/` is built as a library, so both the app and the tests can use
 
 ## 3. OS / Tools / Versions Used
 
-| | |
-|---|---|
-| Operating system | Windows 11 Home (64-bit) |
-| Compiler | g++ 15.2.0 (MinGW-w64) |
-| Build system | CMake 3.20.21032501 |
-| Generator | MinGW Makefiles |
-| Test framework | GoogleTest v1.15.2 (downloaded by CMake) |
-| Shell | Windows PowerShell |
+####1.OS - Win 11
+####2.Compiler - g++ 15.2.0
+####3.Build System - CMake 3.20
+####4.Test Framework - Google Test v1.15.2
+####5.Shell - Windows Powershell
+
 
 ## 4. Build & Run Instructions
 
 ```powershell
-cmake -S . -B build -G "MinGW Makefiles"    # configure, once
+cmake -S . -B build -G "MinGW Makefiles"     # configure, once
 cmake --build build                          # build
-ctest --test-dir build --output-on-failure   # run tests
+ctest --test-dir build                       # run tests
 .\build\hotel_app.exe                        # run the program
 ```
 
