@@ -110,6 +110,21 @@ Run the program:
 
     .\build\hotel_app.exe
 
+IMPORTANT - run this in a real terminal window (Command Prompt,
+PowerShell or Windows Terminal), NOT inside an editor's built-in
+terminal panel.
+
+This program is interactive - it waits for you to type menu choices.
+Some editor terminals and "Run" buttons hand the program a pipe
+instead of a real console. When that happens the menu still appears,
+but your keystrokes never reach the program, so it looks frozen -
+you type a number, press Enter, and nothing happens.
+
+If that happens, open a normal terminal and run it from there, or
+launch it in its own window with:
+
+    Start-Process cmd -ArgumentList "/k", ".\build\hotel_app.exe"
+
 Input formats:
 
     Category    type Standard or Deluxe
