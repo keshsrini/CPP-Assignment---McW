@@ -6,6 +6,7 @@ A menu-driven hotel reservation system written in C++20, running in the terminal
 
 The hotel starts with 10 rooms:
 101 - 105    Standard    2 guests    2000/night
+
 201 - 205    Deluxe      3 guests    3500/night
 
 
