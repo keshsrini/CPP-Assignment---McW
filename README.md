@@ -35,11 +35,11 @@ include/hotel/      Headers. One per class: Guest, RoomCategory,
 
 src/                The matching .cpp files. One per header.
 
-app/main.cpp        The menu. The only file that reads the keyboard.
+app/main.cpp        The main app
 
 tests/              67 GoogleTest unit tests, one file per class.
 
-build/              Compiler output. Created by CMake, not in git.
+build/              Compiler output. Created by CMake, not in git as mentioned
 
 report/             For the written report.
 
@@ -62,7 +62,6 @@ The logic in `src/` is built as a library, so both the app and the tests can use
 | Compiler | g++ 15.2.0 (MinGW-w64) |
 | Build system | CMake 3.20.21032501 |
 | Generator | MinGW Makefiles |
-| C++ standard | C++20 (required - uses `std::chrono` dates and `std::format`) |
 | Test framework | GoogleTest v1.15.2 (downloaded by CMake) |
 | Shell | Windows PowerShell |
 
@@ -75,10 +74,10 @@ ctest --test-dir build --output-on-failure   # run tests
 .\build\hotel_app.exe                        # run the program
 ```
 
-Run the program in a real terminal window, not an editor's built-in terminal panel. Editor panels often don't pass typed input to the program, so the menu appears but nothing responds. To launch it in its own window:
+You can also run using this command
 
 ```powershell
-Start-Process cmd "/k .\build\hotel_app.exe" -WorkingDirectory $PWD
+Start-Process .\build\hotel_app.exe
 ```
 
 Input formats:
@@ -101,9 +100,9 @@ A booking, check-in and check-out:
 >> Checked out. Total bill = 6000
 ```
 
-The bill for 05/10/2026 to 08/10/2026 is 3 nights x 2000 = 6000. It is 3 nights, not 4 - the guest sleeps on the 5th, 6th and 7th and leaves on the 8th.
+The bill for 05/10/2026 to 08/10/2026 is 3 nights x 2000 = 6000.
 
-Note down the Reservation ID. You need it to check in, check out, cancel or modify.
+Note down the Reservation ID. You need it to check in, check out, cancel or modify using that only
 
 Report output (option 6):
 
