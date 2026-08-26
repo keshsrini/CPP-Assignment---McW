@@ -143,20 +143,41 @@ leaves on the 8th.
 Note down the Reservation ID when you book. You need it to check in,
 check out or cancel.
 
-Report output:
+Report output (option 6), shown here after one completed stay:
 
-    --- REPORT ---
-      Deluxe occupancy: 0.0%
-      Standard occupancy: 0.0%
-      Total revenue: 6000.0
-      Avg stay length: 3.0 nights
+    =============== REPORT ===============
 
-    Occupancy       rooms of that type occupied right now, meaning a
-                    guest is currently checked in. Goes back to 0%
-                    after check-out.
-    Total revenue   sum of all bills from completed check-outs. Stays
-                    0 while a guest is still in the room.
-    Avg stay        total nights divided by number of check-outs.
+    Occupancy  (rooms with a guest checked in right now)
+      Deluxe    0 of 2 rooms  (0.0%)
+      Standard  0 of 2 rooms  (0.0%)
+
+    Reservations  (1 total)
+      Booked, awaiting check-in : 0
+      Currently checked in      : 0
+      Completed stays           : 1
+      Cancelled                 : 0
+
+    Revenue  (billed at check-out)
+      Total collected     : 6000.00
+      Average stay length : 3.0 nights
+
+    ======================================
+
+    Occupancy       rooms of that type with a guest checked in RIGHT
+                    NOW. A room that is booked but not yet checked in
+                    still counts as free, and it returns to 0% after
+                    check-out. It is a live snapshot, not a history.
+    Reservations    every booking grouped by its current state. This
+                    is where a new booking shows up immediately.
+    Total collected sum of all bills from completed check-outs. Stays
+                    0.00 while a guest is still in the room.
+    Average stay    total nights divided by number of check-outs.
+
+If you book a room and then open the report, occupancy stays at 0%
+and revenue stays at 0.00. That is correct, not a bug - the booking
+appears under "Booked, awaiting check-in". Occupancy only moves after
+you check the guest in, and revenue only after you check them out.
+The report prints a reminder about this until the first check-out.
 
 Message types:
 

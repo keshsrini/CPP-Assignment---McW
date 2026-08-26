@@ -63,14 +63,47 @@ year_month_day readDate(const std::string& prompt) {
 }
 
 void printReport(const Report& report) {
-    std::cout << "\n--- REPORT ---\n";
+    // Remember the stream's formatting so the fixed/precision settings below
+    // don't leak into everything printed afterwards.
+    const std::ios::fmtflags savedFlags = std::cout.flags();
+    const std::streamsize savedPrecision = std::cout.precision();
+
+    std::cout << "\n=============== REPORT ===============\n";
+
+    std::cout << "\nOccupancy  (rooms with a guest checked in right now)\n";
     for (const auto& c : report.occupancyByCategory) {
-        std::cout << "  " << c.category << " occupancy: "
-                  << std::fixed << std::setprecision(1)
-                  << (c.occupancyRate * 100) << "%\n";
+        std::cout << "  " << std::left << std::setw(10) << c.category
+                  << c.occupiedRooms << " of " << c.totalRooms << " rooms"
+                  << "  (" << std::fixed << std::setprecision(1)
+                  << (c.occupancyRate * 100) << "%)\n";
+        std::cout.unsetf(std::ios::left);
     }
-    std::cout << "  Total revenue: " << report.totalRevenue << "\n";
-    std::cout << "  Avg stay length: " << report.averageStayLengthNights << " nights\n";
+
+    const int totalReservations = report.bookedAwaitingCheckIn + report.currentlyCheckedIn +
+                                  report.completedStays + report.cancelled;
+
+    std::cout << "\nReservations  (" << totalReservations << " total)\n";
+    std::cout << "  Booked, awaiting check-in : " << report.bookedAwaitingCheckIn << "\n";
+    std::cout << "  Currently checked in      : " << report.currentlyCheckedIn << "\n";
+    std::cout << "  Completed stays           : " << report.completedStays << "\n";
+    std::cout << "  Cancelled                 : " << report.cancelled << "\n";
+
+    std::cout << "\nRevenue  (billed at check-out)\n";
+    std::cout << "  Total collected     : " << std::fixed << std::setprecision(2)
+              << report.totalRevenue << "\n";
+    std::cout << "  Average stay length : " << std::setprecision(1)
+              << report.averageStayLengthNights << " nights\n";
+
+    if (report.completedStays == 0) {
+        std::cout << "\n  Note: revenue and average stay stay at 0 until a guest\n"
+                  << "        checks out. Occupancy counts only checked-in guests,\n"
+                  << "        so a booked room shows as free until check-in.\n";
+    }
+
+    std::cout << "\n======================================\n";
+
+    std::cout.flags(savedFlags);
+    std::cout.precision(savedPrecision);
 }
 
 void printMenu() {

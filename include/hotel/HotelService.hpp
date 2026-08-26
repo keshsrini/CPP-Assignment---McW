@@ -20,13 +20,23 @@ namespace hotel {
 
 struct CategoryOccupancy {
     std::string category;
-    double occupancyRate;
+    double occupancyRate;   // occupiedRooms / totalRooms, 0.0 to 1.0
+    int totalRooms = 0;
+    int occupiedRooms = 0;
 };
 
 struct Report {
     std::vector<CategoryOccupancy> occupancyByCategory;
-    double totalRevenue;
-    double averageStayLengthNights;
+    double totalRevenue = 0.0;
+    double averageStayLengthNights = 0.0;
+
+    // Reservation counts by status. Without these the report reads as all
+    // zeros until somebody actually checks out, which makes a working
+    // system look broken.
+    int bookedAwaitingCheckIn = 0;
+    int currentlyCheckedIn = 0;
+    int completedStays = 0;
+    int cancelled = 0;
 };
 
 /**

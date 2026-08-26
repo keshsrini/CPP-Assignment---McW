@@ -145,7 +145,18 @@ Report HotelService::getReports() const {
     for (const auto& [category, total] : totalByCategory) {
         int occupied = occupiedByCategory.count(category) ? occupiedByCategory[category] : 0;
         double rate = total > 0 ? static_cast<double>(occupied) / total : 0.0;
-        report.occupancyByCategory.push_back({category, rate});
+        report.occupancyByCategory.push_back({category, rate, total, occupied});
+    }
+
+    // Count reservations by status so the report shows booking activity,
+    // not just guests who have already checked out.
+    for (const auto& [id, reservation] : reservations_) {
+        switch (reservation.getStatus()) {
+            case ReservationStatus::Booked:      report.bookedAwaitingCheckIn++; break;
+            case ReservationStatus::CheckedIn:   report.currentlyCheckedIn++;    break;
+            case ReservationStatus::CheckedOut:  report.completedStays++;        break;
+            case ReservationStatus::Cancelled:   report.cancelled++;             break;
+        }
     }
 
     report.totalRevenue = totalRevenue_;
