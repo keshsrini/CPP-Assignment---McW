@@ -127,12 +127,20 @@ int main() {
         std::vector<std::string>{"WiFi", "TV", "Mini-bar"});
 
     HotelService hotel(std::make_unique<StandardBillingStrategy>());
-    hotel.addRoom(101, standard);
-    hotel.addRoom(102, standard);
-    hotel.addRoom(201, deluxe);
-    hotel.addRoom(202, deluxe);
 
-    std::cout << "Hotel initialized: rooms 101, 102 (Standard), 201, 202 (Deluxe)\n";
+    // 5 Standard rooms on floor 1 (101-105), 5 Deluxe on floor 2 (201-205).
+    // Every room must be registered here, before any booking happens, because
+    // AvailabilityIndex only looks up existing per-room locks once threads are
+    // running - it never inserts new ones.
+    constexpr int roomsPerCategory = 5;
+    for (int i = 1; i <= roomsPerCategory; ++i) {
+        hotel.addRoom(100 + i, standard);
+        hotel.addRoom(200 + i, deluxe);
+    }
+
+    std::cout << "Hotel initialized:\n"
+              << "  Standard  rooms 101-105  (" << roomsPerCategory << " rooms, 2 guests, 2000/night)\n"
+              << "  Deluxe    rooms 201-205  (" << roomsPerCategory << " rooms, 3 guests, 3500/night)\n";
 
     bool running = true;
     while (running) {

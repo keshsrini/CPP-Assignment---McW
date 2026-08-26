@@ -8,10 +8,10 @@ HOTEL RESERVATION SYSTEM - C++
 A hotel reservation system written in C++20. It runs in the terminal
 as a menu-driven program.
 
-The hotel starts with 4 rooms:
+The hotel starts with 10 rooms:
 
-    Room 101, 102   Standard   (2 guests, 2000 per night)
-    Room 201, 202   Deluxe     (3 guests, 3500 per night)
+    Rooms 101-105   Standard   (5 rooms, 2 guests, 2000 per night)
+    Rooms 201-205   Deluxe     (5 rooms, 3 guests, 3500 per night)
 
 From the menu you can book a room for a date range, check a guest in,
 check them out (which generates the bill), cancel a booking, move a
@@ -174,8 +174,8 @@ Report output (option 6), shown here after one completed stay:
     =============== REPORT ===============
 
     Occupancy  (rooms with a guest checked in right now)
-      Deluxe    0 of 2 rooms  (0.0%)
-      Standard  0 of 2 rooms  (0.0%)
+      Deluxe    0 of 5 rooms  (0.0%)
+      Standard  0 of 5 rooms  (0.0%)
 
     Reservations  (1 total)
       Booked, awaiting check-in : 0
