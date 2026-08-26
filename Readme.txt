@@ -171,7 +171,7 @@ to 5, so the bill becomes 10000 instead of 6000.
 
 Report output (option 6), shown here after one completed stay:
 
-    =============== REPORT ===============
+    === REPORT ===
 
     Occupancy  (rooms with a guest checked in right now)
       Deluxe    0 of 5 rooms  (0.0%)
