@@ -6,20 +6,20 @@ A menu-driven hotel reservation system written in C++20, running in the terminal
 
 The hotel starts with 10 rooms:
 
-101 - 105    Standard    2 guests    2000/night
+- 101 - 105    Standard    2 guests    2000/night
 
-201 - 205    Deluxe      3 guests    3500/night
+- 201 - 205    Deluxe      3 guests    3500/night
 
 
 You can book a room for a date range, check a guest in, check them out (which generates the bill), cancel a booking, move a booking to different dates, search for free rooms, and view occupancy and revenue reports.
 
 A booking moves through these states, and anything else is rejected with an error:
 
-Booked->Checked In->Checked Out
+- Booked->Checked In->Checked Out
 
-Booked->Cancelled
+- Booked->Cancelled
 
-Booked->Modified->Checked In->CheckedOut
+- Booked->Modified->Checked In->CheckedOut
 
 
 
