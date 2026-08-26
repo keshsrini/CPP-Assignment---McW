@@ -64,6 +64,16 @@ public:
     double checkOut(int reservationId, double serviceCharges = 0.0);
     void cancelReservation(int reservationId);
 
+    /**
+     * Moves a still-Booked reservation to new dates, keeping the same room.
+     *
+     * Throws InvalidReservationException if the id is unknown or the guest has
+     * already checked in / out / cancelled, and RoomUnavailableException if the
+     * room is taken for the new dates. On either failure the original booking
+     * is left exactly as it was.
+     */
+    void modifyReservation(int reservationId, const DateRange& newDates);
+
     std::vector<Room*> searchRooms(const std::string& categoryName, const DateRange& dates);
 
     Report getReports() const;

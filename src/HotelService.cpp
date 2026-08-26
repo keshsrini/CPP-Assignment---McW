@@ -2,9 +2,20 @@
 #include "hotel/Exceptions.hpp"
 
 #include <chrono>
+#include <format>
 #include <string>
 
 namespace hotel {
+
+namespace {
+
+/** Renders a stay as "05/10/2026 - 08/10/2026" for log messages. */
+std::string formatDate(const DateRange& range) {
+    return std::format("{:%d/%m/%Y} - {:%d/%m/%Y}",
+                       range.getCheckIn(), range.getCheckOut());
+}
+
+} // namespace
 
 HotelService::HotelService(std::unique_ptr<BillingStrategy> billingStrategy)
     : billingStrategy_(std::move(billingStrategy)) {}
@@ -100,6 +111,35 @@ double HotelService::checkOut(int reservationId, double serviceCharges) {
                 " bill " + std::to_string(bill));
 
     return bill;
+}
+
+void HotelService::modifyReservation(int reservationId, const DateRange& newDates) {
+    std::lock_guard<std::mutex> lock(reservationsMutex_);
+    Reservation& reservation = findReservationUnlocked(reservationId);
+
+    if (reservation.getStatus() != ReservationStatus::Booked) {
+        throw InvalidReservationException(
+            "Only a Booked reservation can be modified: reservation " +
+            std::to_string(reservationId) + " has already been checked in, "
+            "checked out or cancelled");
+    }
+
+    const DateRange oldDates = reservation.getDates();
+    const int roomNumber = reservation.getRoomNumber();
+
+    // One atomic swap on this room's lock. If it fails, the index still holds
+    // the original dates, so throwing here leaves the booking untouched.
+    if (!availabilityIndex_.tryReplace(roomNumber, oldDates, newDates)) {
+        throw RoomUnavailableException(
+            "Room " + std::to_string(roomNumber) + " is not free for the new dates; "
+            "reservation " + std::to_string(reservationId) + " is unchanged");
+    }
+
+    reservation.setDates(newDates);
+
+    logger_.log("Modified: reservation " + std::to_string(reservationId) +
+                " room " + std::to_string(roomNumber) +
+                " moved from " + formatDate(oldDates) + " to " + formatDate(newDates));
 }
 
 void HotelService::cancelReservation(int reservationId) {

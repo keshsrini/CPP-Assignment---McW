@@ -14,8 +14,9 @@ The hotel starts with 4 rooms:
     Room 201, 202   Deluxe     (3 guests, 3500 per night)
 
 From the menu you can book a room for a date range, check a guest in,
-check them out (which generates the bill), cancel a booking, search
-for free rooms, and view occupancy and revenue reports.
+check them out (which generates the bill), cancel a booking, move a
+booking to different dates, search for free rooms, and view occupancy
+and revenue reports.
 
 A booking moves through these states:
 
@@ -59,7 +60,7 @@ the same dates, only one succeeds - there is no double booking.
                         HotelService. The only file that reads the
                         keyboard.
 
-    tests/              56 unit tests using GoogleTest, one test file
+    tests/              67 unit tests using GoogleTest, one test file
                         per class.
 
     build/              Compiler output. Created by CMake, not in git.
@@ -159,7 +160,14 @@ It is 3 nights, not 4 - the guest sleeps on the 5th, 6th and 7th and
 leaves on the 8th.
 
 Note down the Reservation ID when you book. You need it to check in,
-check out or cancel.
+check out, cancel or modify.
+
+Changing the dates of a booking (option 7) keeps the same room and
+only works before check-in. If the room is already taken for the new
+dates, the change is refused and your original booking is left exactly
+as it was. Because the bill is worked out from the reservation's dates,
+moving 05/10 - 08/10 to 05/10 - 10/10 changes the stay from 3 nights
+to 5, so the bill becomes 10000 instead of 6000.
 
 Report output (option 6), shown here after one completed stay:
 
@@ -218,6 +226,13 @@ Common errors and what they mean:
     Reservation is not in Booked state, cannot check in
         Already checked in, or the booking was cancelled.
 
+    Room 101 is not free for the new dates; reservation 1 is unchanged
+        You tried to move a booking onto dates that room already has
+        taken. Your original booking is untouched.
+
+    Only a Booked reservation can be modified
+        Dates can only be changed before check-in.
+
     Reservation is not in CheckedIn state, cannot check out
         Check the guest in first.
 
@@ -226,7 +241,7 @@ the menu.
 
 Test output:
 
-    100% tests passed, 0 tests failed out of 56
+    100% tests passed, 0 tests failed out of 67
 
 That is what to look for. A failing test prints [ FAILED ] with the
 file, line number, expected value and actual value.

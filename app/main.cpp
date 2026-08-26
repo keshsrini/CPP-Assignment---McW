@@ -107,14 +107,15 @@ void printReport(const Report& report) {
 }
 
 void printMenu() {
-    std::cout << "\n=== Hotel Reservation System ===\n"
+    std::cout << "\n=== Hola!!. Welcome to Keshav's Hotel Reservation System ===\n"
               << "1. Book a room\n"
               << "2. Check in\n"
               << "3. Check out\n"
               << "4. Cancel reservation\n"
               << "5. Search available rooms\n"
               << "6. View reports\n"
-              << "7. Exit\n";
+              << "7. Modify reservation dates\n"
+              << "8. Exit\n";
 }
 
 int main() {
@@ -193,12 +194,22 @@ int main() {
                     break;
                 }
                 case 7: {
+                    int id = readInt("Reservation ID to modify: ");
+                    year_month_day checkIn = readDate("New check-in date (DD/MM/YYYY): ");
+                    year_month_day checkOut = readDate("New check-out date (DD/MM/YYYY): ");
+                    DateRange newDates(checkIn, checkOut);
+                    hotel.modifyReservation(id, newDates);
+
+                    std::cout << ">> Reservation " << id << " moved to the new dates\n";
+                    break;
+                }
+                case 8: {
                     running = false;
                     std::cout << "Goodbye.\n";
                     break;
                 }
                 default:
-                    std::cout << "Invalid option, choose 1-7.\n";
+                    std::cout << "Invalid option, choose 1-8.\n";
             }
         } catch (const HotelException& e) {
             // Every domain error surfaces here — nothing crashes, everything

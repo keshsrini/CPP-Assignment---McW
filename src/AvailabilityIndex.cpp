@@ -32,8 +32,7 @@ void AvailabilityIndex::markBooked(int roomNumber, const DateRange& range) {
     markBookedUnlocked(roomNumber, range);
 }
 
-void AvailabilityIndex::markFreed(int roomNumber, const DateRange& range) {
-    std::lock_guard<std::mutex> lock(roomMutexes_.at(roomNumber));
+void AvailabilityIndex::removeRangeUnlocked(int roomNumber, const DateRange& range) {
     auto& ranges = bookedRanges_.at(roomNumber);
     ranges.erase(
         std::remove_if(ranges.begin(), ranges.end(),
@@ -45,12 +44,35 @@ void AvailabilityIndex::markFreed(int roomNumber, const DateRange& range) {
     );
 }
 
+void AvailabilityIndex::markFreed(int roomNumber, const DateRange& range) {
+    std::lock_guard<std::mutex> lock(roomMutexes_.at(roomNumber));
+    removeRangeUnlocked(roomNumber, range);
+}
+
 bool AvailabilityIndex::tryBook(int roomNumber, const DateRange& range) {
     std::lock_guard<std::mutex> lock(roomMutexes_.at(roomNumber));
     if (!isAvailableUnlocked(roomNumber, range)) {
         return false;
     }
     markBookedUnlocked(roomNumber, range);
+    return true;
+}
+
+bool AvailabilityIndex::tryReplace(int roomNumber,
+                                   const DateRange& oldRange,
+                                   const DateRange& newRange) {
+    std::lock_guard<std::mutex> lock(roomMutexes_.at(roomNumber));
+
+    // Drop the old range first so the new one is not compared against the
+    // very booking we are moving.
+    removeRangeUnlocked(roomNumber, oldRange);
+
+    if (!isAvailableUnlocked(roomNumber, newRange)) {
+        markBookedUnlocked(roomNumber, oldRange);   // roll back, nothing changed
+        return false;
+    }
+
+    markBookedUnlocked(roomNumber, newRange);
     return true;
 }
 

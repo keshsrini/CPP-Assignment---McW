@@ -17,4 +17,6 @@ ReservationStatus Reservation::getStatus() const { return status_; }
 
 void Reservation::setStatus(ReservationStatus status) { status_ = status; }
 
+void Reservation::setDates(const DateRange& dates) { dates_ = dates; }
+
 }

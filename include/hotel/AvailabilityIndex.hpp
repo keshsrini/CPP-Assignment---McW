@@ -38,9 +38,27 @@ public:
      */
     bool tryBook(int roomNumber, const DateRange& range);
 
+    /**
+     * Atomically moves an existing booking from oldRange to newRange on the
+     * same room, under ONE lock acquisition. Returns true on success, false
+     * if newRange clashes with some OTHER booking on that room — in which
+     * case oldRange is put back and nothing has changed.
+     *
+     * Why this can't be done with markFreed() + tryBook(): those are two
+     * separate lock acquisitions, so between them the room sits with neither
+     * range held and a concurrent bookRoom() could steal the freed dates,
+     * leaving the guest with no booking at all if the new dates then fail.
+     *
+     * Removing oldRange BEFORE testing newRange is also what lets a booking
+     * shift by a night or two. Moving 5-8 Oct to 6-9 Oct overlaps itself, so
+     * testing first would always report a clash with its own booking.
+     */
+    bool tryReplace(int roomNumber, const DateRange& oldRange, const DateRange& newRange);
+
 private:
     bool isAvailableUnlocked(int roomNumber, const DateRange& range) const;
     void markBookedUnlocked(int roomNumber, const DateRange& range);
+    void removeRangeUnlocked(int roomNumber, const DateRange& range);
 
     std::map<int, std::vector<DateRange>> bookedRanges_;
     mutable std::map<int, std::mutex> roomMutexes_;
