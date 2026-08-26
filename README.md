@@ -5,6 +5,7 @@
 A menu-driven hotel reservation system written in C++20, running in the terminal.
 
 The hotel starts with 10 rooms:
+
 101 - 105    Standard    2 guests    2000/night
 
 201 - 205    Deluxe      3 guests    3500/night
@@ -15,7 +16,9 @@ You can book a room for a date range, check a guest in, check them out (which ge
 A booking moves through these states, and anything else is rejected with an error:
 
 Booked->Checked In->Checked Out
+
 Booked->Cancelled
+
 Booked->Modified->Checked In->CheckedOut
 
 
