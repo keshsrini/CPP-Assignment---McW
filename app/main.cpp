@@ -45,7 +45,6 @@ std::string readLine(const std::string& prompt) {
     return value;
 }
 
-// Reads "DD/MM/YYYY" into a year_month_day. Loops until valid.
 year_month_day readDate(const std::string& prompt) {
     while (true) {
         std::string s = readLine(prompt);
@@ -63,12 +62,10 @@ year_month_day readDate(const std::string& prompt) {
 }
 
 void printReport(const Report& report) {
-    // Remember the stream's formatting so the fixed/precision settings below
-    // don't leak into everything printed afterwards.
     const std::ios::fmtflags savedFlags = std::cout.flags();
     const std::streamsize savedPrecision = std::cout.precision();
 
-    std::cout << "\n=============== REPORT ===============\n";
+    std::cout << "\n=== REPORT ===\n";
 
     std::cout << "\nOccupancy  (rooms with a guest checked in right now)\n";
     for (const auto& c : report.occupancyByCategory) {
@@ -107,7 +104,7 @@ void printReport(const Report& report) {
 }
 
 void printMenu() {
-    std::cout << "\n=== Hola!!. Welcome to Keshav's Hotel Reservation System ===\n"
+    std::cout << "\n= Hola!!. Welcome to Keshav's Hotel Reservation System =\n"
               << "1. Book a room\n"
               << "2. Check in\n"
               << "3. Check out\n"
@@ -119,8 +116,6 @@ void printMenu() {
 }
 
 int main() {
-    // Set up inventory once at startup — this part stays fixed,
-    // since dynamically adding rooms/categories isn't part of the assignment scope.
     auto standard = std::make_shared<RoomCategory>("Standard", 2, 2000.0,
         std::vector<std::string>{"WiFi", "TV"});
     auto deluxe = std::make_shared<RoomCategory>("Deluxe", 3, 3500.0,
@@ -128,10 +123,6 @@ int main() {
 
     HotelService hotel(std::make_unique<StandardBillingStrategy>());
 
-    // 5 Standard rooms on floor 1 (101-105), 5 Deluxe on floor 2 (201-205).
-    // Every room must be registered here, before any booking happens, because
-    // AvailabilityIndex only looks up existing per-room locks once threads are
-    // running - it never inserts new ones.
     constexpr int roomsPerCategory = 5;
     for (int i = 1; i <= roomsPerCategory; ++i) {
         hotel.addRoom(100 + i, standard);
@@ -220,8 +211,6 @@ int main() {
                     std::cout << "Invalid option, choose 1-8.\n";
             }
         } catch (const HotelException& e) {
-            // Every domain error surfaces here — nothing crashes, everything
-            // is a caught, named exception type from your hierarchy.
             std::cout << "!! Error: " << e.what() << "\n";
         }
     }

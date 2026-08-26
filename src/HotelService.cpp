@@ -9,13 +9,12 @@ namespace hotel {
 
 namespace {
 
-/** Renders a stay as "05/10/2026 - 08/10/2026" for log messages. */
 std::string formatDate(const DateRange& range) {
     return std::format("{:%d/%m/%Y} - {:%d/%m/%Y}",
                        range.getCheckIn(), range.getCheckOut());
 }
 
-} // namespace
+} 
 
 HotelService::HotelService(std::unique_ptr<BillingStrategy> billingStrategy)
     : billingStrategy_(std::move(billingStrategy)) {}
@@ -47,9 +46,6 @@ Reservation HotelService::bookRoom(const std::string& categoryName, const DateRa
         if (room->getCategory()->getName() != categoryName) {
             continue;
         }
-
-        // tryBook() is the atomic check-and-book — the fix for the classic
-        // "check, then act" race between concurrent booking threads.
         if (availabilityIndex_.tryBook(room->getRoomNumber(), dates)) {
             int id = nextReservationId_++; // atomic increment — safe across threads
             Reservation reservation(id, room->getRoomNumber(), std::move(guest), dates);
@@ -126,9 +122,6 @@ void HotelService::modifyReservation(int reservationId, const DateRange& newDate
 
     const DateRange oldDates = reservation.getDates();
     const int roomNumber = reservation.getRoomNumber();
-
-    // One atomic swap on this room's lock. If it fails, the index still holds
-    // the original dates, so throwing here leaves the booking untouched.
     if (!availabilityIndex_.tryReplace(roomNumber, oldDates, newDates)) {
         throw RoomUnavailableException(
             "Room " + std::to_string(roomNumber) + " is not free for the new dates; "
@@ -187,9 +180,6 @@ Report HotelService::getReports() const {
         double rate = total > 0 ? static_cast<double>(occupied) / total : 0.0;
         report.occupancyByCategory.push_back({category, rate, total, occupied});
     }
-
-    // Count reservations by status so the report shows booking activity,
-    // not just guests who have already checked out.
     for (const auto& [id, reservation] : reservations_) {
         switch (reservation.getStatus()) {
             case ReservationStatus::Booked:      report.bookedAwaitingCheckIn++; break;

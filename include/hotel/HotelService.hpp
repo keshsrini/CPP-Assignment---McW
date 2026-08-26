@@ -20,7 +20,7 @@ namespace hotel {
 
 struct CategoryOccupancy {
     std::string category;
-    double occupancyRate;   // occupiedRooms / totalRooms, 0.0 to 1.0
+    double occupancyRate;  
     int totalRooms = 0;
     int occupiedRooms = 0;
 };
@@ -29,29 +29,12 @@ struct Report {
     std::vector<CategoryOccupancy> occupancyByCategory;
     double totalRevenue = 0.0;
     double averageStayLengthNights = 0.0;
-
-    // Reservation counts by status. Without these the report reads as all
-    // zeros until somebody actually checks out, which makes a working
-    // system look broken.
     int bookedAwaitingCheckIn = 0;
     int currentlyCheckedIn = 0;
     int completedStays = 0;
     int cancelled = 0;
 };
 
-/**
- * Top-level facade. Owns the room inventory, AvailabilityIndex,
- * BillingStrategy, and Logger, and coordinates every operation.
- *
- * Thread safety: bookRoom() is safe to call concurrently from multiple
- * threads (per-room locking in AvailabilityIndex + a mutex guarding the
- * shared reservations map/ID counter). checkIn/checkOut/cancelReservation
- * lock the same reservations mutex, so they're safe with respect to each
- * other and to concurrent bookings too. Room.setStatus() itself is a
- * simple field write — fine for this assignment's concurrent-BOOKING
- * requirement, though a fully hardened production system would protect
- * per-room status writes as well.
- */
 class HotelService {
 public:
     explicit HotelService(std::unique_ptr<BillingStrategy> billingStrategy);
@@ -63,15 +46,6 @@ public:
     void checkIn(int reservationId);
     double checkOut(int reservationId, double serviceCharges = 0.0);
     void cancelReservation(int reservationId);
-
-    /**
-     * Moves a still-Booked reservation to new dates, keeping the same room.
-     *
-     * Throws InvalidReservationException if the id is unknown or the guest has
-     * already checked in / out / cancelled, and RoomUnavailableException if the
-     * room is taken for the new dates. On either failure the original booking
-     * is left exactly as it was.
-     */
     void modifyReservation(int reservationId, const DateRange& newDates);
 
     std::vector<Room*> searchRooms(const std::string& categoryName, const DateRange& dates);

@@ -125,10 +125,6 @@ TEST(HotelServiceTest, CheckInThrowsForNonexistentReservation) {
     EXPECT_THROW(service->checkIn(9999), InvalidReservationException);
 }
 
-// --- modifyReservation -----------------------------------------------------
-
-// Billing reads the reservation's dates at check-out, so a correct bill for the
-// NEW length proves the stored dates really moved, not just the index.
 TEST(HotelServiceTest, ModifyReservationChangesStayLengthAndBill) {
     auto service = makeServiceWithRooms();
     DateRange original(2026y/October/5d, 2026y/October/8d);   // 3 nights = 6000
@@ -147,21 +143,16 @@ TEST(HotelServiceTest, ModifyReservationChangesStayLengthAndBill) {
 TEST(HotelServiceTest, ModifyReservationReleasesTheOldDates) {
     auto service = makeServiceWithRooms();
     DateRange original(2026y/October/5d, 2026y/October/8d);
-
-    // Fill both Standard rooms so the category is full for those dates.
     Reservation res1 = service->bookRoom("Standard", original, Guest("G1", "A", "a@example.com"));
     service->bookRoom("Standard", original, Guest("G2", "B", "b@example.com"));
     EXPECT_THROW(service->bookRoom("Standard", original, Guest("G3", "C", "c@example.com")),
                  RoomUnavailableException);
 
-    // Move one booking well away; its old dates should free up.
     DateRange moved(2026y/December/1d, 2026y/December/4d);
     service->modifyReservation(res1.getReservationId(), moved);
 
     EXPECT_NO_THROW(service->bookRoom("Standard", original, Guest("G4", "D", "d@example.com")));
 }
-
-// Shifting a stay by one night overlaps its own existing booking.
 TEST(HotelServiceTest, ModifyReservationCanShiftDatesOntoOverlappingRange) {
     auto service = makeServiceWithRooms();
     DateRange original(2026y/October/5d, 2026y/October/8d);
@@ -174,20 +165,16 @@ TEST(HotelServiceTest, ModifyReservationCanShiftDatesOntoOverlappingRange) {
 
 TEST(HotelServiceTest, ModifyReservationThrowsWhenNewDatesTakenAndKeepsOriginal) {
     auto service = makeServiceWithRooms();
-
-    // Both bookings land on room 101 - same room, non-overlapping dates.
     DateRange early(2026y/October/5d, 2026y/October/8d);
     DateRange late(2026y/October/12d, 2026y/October/15d);
     Reservation res1 = service->bookRoom("Standard", early, Guest("G1", "A", "a@example.com"));
     Reservation res2 = service->bookRoom("Standard", late, Guest("G2", "B", "b@example.com"));
     ASSERT_EQ(res1.getRoomNumber(), res2.getRoomNumber());
 
-    // Moving res1 onto res2's dates must fail.
     DateRange clashing(2026y/October/13d, 2026y/October/14d);
     EXPECT_THROW(service->modifyReservation(res1.getReservationId(), clashing),
                  RoomUnavailableException);
 
-    // res1 must still hold its original 3 nights, so the bill is unchanged.
     service->checkIn(res1.getReservationId());
     EXPECT_DOUBLE_EQ(service->checkOut(res1.getReservationId()), 6000.0);
 }

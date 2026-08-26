@@ -62,13 +62,10 @@ bool AvailabilityIndex::tryReplace(int roomNumber,
                                    const DateRange& oldRange,
                                    const DateRange& newRange) {
     std::lock_guard<std::mutex> lock(roomMutexes_.at(roomNumber));
-
-    // Drop the old range first so the new one is not compared against the
-    // very booking we are moving.
     removeRangeUnlocked(roomNumber, oldRange);
 
     if (!isAvailableUnlocked(roomNumber, newRange)) {
-        markBookedUnlocked(roomNumber, oldRange);   // roll back, nothing changed
+        markBookedUnlocked(roomNumber, oldRange);   
         return false;
     }
 

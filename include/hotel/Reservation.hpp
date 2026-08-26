@@ -23,9 +23,6 @@ public:
     ReservationStatus getStatus() const;
 
     void setStatus(ReservationStatus status);
-
-    /** Replaces the stay dates. Only meaningful before check-in; HotelService
-     *  enforces that and updates the AvailabilityIndex to match. */
     void setDates(const DateRange& dates);
 
 private:

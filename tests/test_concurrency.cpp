@@ -7,10 +7,6 @@
 using namespace std::chrono;
 using hotel::AvailabilityIndex;
 using hotel::DateRange;
-
-// Heavy contention: multiple threads racing for the SAME rooms and SAME
-// dates. If tryBook() weren't properly locked, more successes than rooms
-// would occur — a real double-booking. Exactly `roomCount` should win.
 TEST(ConcurrencyTest, ConcurrentBookingsNeverDoubleBookSameRoom) {
     AvailabilityIndex index;
     const int roomCount = 3;
@@ -25,10 +21,6 @@ TEST(ConcurrencyTest, ConcurrentBookingsNeverDoubleBookSameRoom) {
     std::vector<std::thread> threads;
     for (int room = 101; room < 101 + roomCount; ++room) {
         for (int i = 0; i < threadsPerRoom; ++i) {
-            // `room` captured BY VALUE — each thread gets its own snapshot.
-            // Capturing by reference here would be a classic bug: all
-            // threads would end up seeing the loop's FINAL value of room,
-            // since the loop variable changes after each thread is created.
             threads.emplace_back([&index, room, &sameRange, &successCount]() {
                 if (index.tryBook(room, sameRange)) {
                     successCount++;
@@ -43,9 +35,6 @@ TEST(ConcurrencyTest, ConcurrentBookingsNeverDoubleBookSameRoom) {
 
     EXPECT_EQ(successCount.load(), roomCount);
 }
-
-// Different rooms, no real conflict — every thread should succeed,
-// proving per-room locks don't needlessly block UNRELATED rooms.
 TEST(ConcurrencyTest, ConcurrentBookingsOnDifferentRoomsAllSucceed) {
     AvailabilityIndex index;
     const int roomCount = 10;
@@ -71,8 +60,6 @@ TEST(ConcurrencyTest, ConcurrentBookingsOnDifferentRoomsAllSucceed) {
 
     EXPECT_EQ(successCount.load(), roomCount);
 }
-
-// Extreme case: 20 threads, ONE room, identical dates — exactly one wins.
 TEST(ConcurrencyTest, HighContentionManyThreadsOneRoomOnlyOneWins) {
     AvailabilityIndex index;
     index.registerRoom(101);
