@@ -121,9 +121,12 @@ but your keystrokes never reach the program, so it looks frozen -
 you type a number, press Enter, and nothing happens.
 
 If that happens, open a normal terminal and run it from there, or
-launch it in its own window with:
+launch it in its own window from PowerShell with:
 
-    Start-Process cmd -ArgumentList "/k", ".\build\hotel_app.exe"
+    Start-Process cmd "/k .\build\hotel_app.exe" -WorkingDirectory $PWD
+
+The -WorkingDirectory part matters, because Start-Process does not
+always inherit the current folder.
 
 Input formats:
 
